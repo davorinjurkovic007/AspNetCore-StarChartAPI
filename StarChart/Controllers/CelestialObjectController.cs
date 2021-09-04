@@ -64,14 +64,14 @@ namespace StarChart.Controllers
             _context.CelestialObjects.Add(celestialObject);
             _context.SaveChanges();
 
-            return CreatedAtRoute("GetById", new { id = celestialObject.Id });
+            return CreatedAtRoute("GetById", new { id = celestialObject.Id }, celestialObject);
 
         }
 
         [HttpPut("{id}")]
         public IActionResult Update(int id, CelestialObject newCelestialObject)
         {
-            var celestialObject = _context.CelestialObjects.Where(e => e.OrbitedObjectId == id).FirstOrDefault();
+            var celestialObject = _context.CelestialObjects.Find(id);
             if(celestialObject == null)
             {
                 return NotFound();
@@ -81,7 +81,7 @@ namespace StarChart.Controllers
             celestialObject.OrbitalPeriod = newCelestialObject.OrbitalPeriod;
             celestialObject.OrbitedObjectId = newCelestialObject.OrbitedObjectId;
 
-            _context.Update(celestialObject);
+            _context.CelestialObjects.Update(celestialObject);
 
             _context.SaveChanges();
 
@@ -98,7 +98,7 @@ namespace StarChart.Controllers
             }
             celestialObject.Name = name;
 
-            _context.Update(celestialObject);
+            _context.CelestialObjects.Update(celestialObject);
 
             _context.SaveChanges();
             return NoContent();
@@ -107,13 +107,13 @@ namespace StarChart.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var celestialObject = _context.CelestialObjects.Where(e => e.OrbitedObjectId == id).FirstOrDefault();
-            if (celestialObject == null)
+            var celestialObject = _context.CelestialObjects.Where(e => e.Id == id ||e.OrbitedObjectId == id);
+            if (!celestialObject.Any())
             {
                 return NotFound();
             }
 
-            _context.RemoveRange(celestialObject);
+            _context.CelestialObjects.RemoveRange(celestialObject);
 
             _context.SaveChanges();
 
